@@ -19,7 +19,11 @@ namespace SalonManagement.Repository
         public ICountryRepository Country { get; private set; } 
         public IStateRepository State { get; private set; } 
         public ICityRepository City { get; private set; }
-     
+        public ISalonBranchXGenderRepository SalonBranchXGender { get; private set; }
+        public ISalonBranchXPaymentRepository SalonBranchXPayment { get; private set; }
+        public ISalonBranchXServiceRepository SalonBranchXService { get; private set; }
+        public IBookingRepository Booking { get; private set; }
+        public ISalonBranchRepository SalonBranch { get; private set; }
      
 
 
@@ -39,6 +43,12 @@ namespace SalonManagement.Repository
             Country = new CountryRepository(_db);
             State = new StateRepository(_db);
             City = new CityRepository(_db);
+            SalonBranchXGender = new SalonBranchXGenderRepository(_db); 
+            SalonBranchXPayment = new SalonBranchXPaymentRepository(_db);
+            SalonBranchXService = new SalonBranchXServiceRepository(_db);
+            Booking = new BookingRepository(_db);
+            SalonBranch = new SalonBranchRepository(_db);
+
         }
 
         public void Save()

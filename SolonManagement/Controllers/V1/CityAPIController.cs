@@ -75,65 +75,6 @@ namespace SalonManagement.Controllers.V1
 
         }
 
-        //[HttpGet(Name = "CityByPagination")]
-        //[ResponseCache(CacheProfileName = "Default30")]
-        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> CityByPagination(string term, string orderBy, int currentPage = 1)
-        //{
-        //    try
-        //    {
-        //        term = string.IsNullOrEmpty(term) ? "" : term.ToLower();
-
-        //        CityIndexVM cityIndexVM = new CityIndexVM();
-        //        IEnumerable<City> list = await _unitOfWork.City.GetAllAsync(includeProperties: "Country,State");
-
-        //        var List = _mapper.Map<List<CityDTO>>(list);
-
-        //        cityIndexVM.NameSortOrder = string.IsNullOrEmpty(orderBy) ? "countryName_desc" : "";
-
-        //        if (!string.IsNullOrEmpty(term))
-        //        {
-        //            List = List.Where(u => u.CityName.ToLower().Contains(term) || 
-        //            u.State.StateName.ToLower().Contains(term)|| u.Country.CountryName.ToLower().Contains(term)).ToList();
-        //        }
-
-        //        switch (orderBy)
-        //        {
-        //            case "countryName_desc":
-        //                List = List.OrderByDescending(a => a.CityName).ToList();
-        //                break;
-
-        //            default:
-        //                List = List.OrderBy(a => a.CityName).ToList();
-        //                break;
-        //        }
-        //        int totalRecords = List.Count();
-        //        int pageSize = 10;
-        //        int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-        //        List = List.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
-        //        // current=1, skip= (1-1=0), take=5 
-        //        // currentPage=2, skip (2-1)*5 = 5, take=5 ,
-        //        cityIndexVM.cities = List;
-        //        cityIndexVM.CurrentPage = currentPage;
-        //        cityIndexVM.TotalPages = totalPages;
-        //        cityIndexVM.Term = term;
-        //        cityIndexVM.PageSize = pageSize;
-        //        cityIndexVM.OrderBy = orderBy;
-
-        //        _response.Result = _mapper.Map<CityIndexVM>(cityIndexVM);
-        //        _response.StatusCode = HttpStatusCode.OK;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ErrorMessages
-        //             = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
 
         [HttpGet("{stateId:int}", Name = "GetCitysByStateId")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -217,18 +158,7 @@ namespace SalonManagement.Controllers.V1
 
             try
             {
-                //if (!ModelState.IsValid)
-                //{
-                //    return BadRequest(ModelState);
-                //}
-
-                //var existingCity = await _unitOfWork.City.GetAsync(u => u.CityName.ToLower() == createDTO.CityName.ToLower() && u.StateId == createDTO.StateId);
-
-                //if (existingCity != null)
-                //{
-                //    ModelState.AddModelError("ErrorMessages", "City already Exists!");
-                //    return BadRequest(ModelState);
-                //}
+                
 
                 if (await _unitOfWork.City.GetAsync(u => u.CityName.Trim().ToLower() == createDTO.CityName.Trim().ToLower() && u.StateId == createDTO.StateId) != null)
                 {
@@ -351,35 +281,6 @@ namespace SalonManagement.Controllers.V1
             return _response;
         }
 
-        //[HttpPatch("{id:int}", Name = "UpdatePartialCity")]
-        //[ProducesResponseType(StatusCodes.Status204NoContent)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<IActionResult> UpdatePartialCity(int id, JsonPatchDocument<CityUpdateDTO> patchDTO)
-        //{
-        //    if (patchDTO == null || id == 0)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    var category = await _unitOfWork.City.GetAsync(u => u.Id == id, tracked: false);
-
-        //    CityUpdateDTO categoryDTO = _mapper.Map<CityUpdateDTO>(category);
-
-
-        //    if (category == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    patchDTO.ApplyTo(categoryDTO, ModelState);
-        //    City model = _mapper.Map<City>(categoryDTO);
-
-        //    await _unitOfWork.City.UpdateAsync(model);
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    return NoContent();
-        //}
 
 
     }

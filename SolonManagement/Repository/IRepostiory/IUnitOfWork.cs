@@ -18,7 +18,11 @@ namespace SalonManagement.Repository.IRepository
         ICountryRepository Country { get; }
         IStateRepository State { get; }
         ICityRepository City{ get; } 
-
+        ISalonBranchXGenderRepository SalonBranchXGender { get; }
+        ISalonBranchXPaymentRepository SalonBranchXPayment { get; }
+        ISalonBranchXServiceRepository SalonBranchXService { get; }
+        IBookingRepository Booking { get; }
+        ISalonBranchRepository SalonBranch { get; }
         void Save();
     }
 }

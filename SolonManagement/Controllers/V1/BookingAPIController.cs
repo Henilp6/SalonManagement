@@ -1,65 +1,57 @@
 ﻿using AutoMapper;
-using SalonManagement.Data;
 using SalonManagement.Models;
 using SalonManagement.Models.Dto;
 using SalonManagement.Repository.IRepository;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Text.Json;
 
-
-namespace SalonManagement.Controllers.V1
+namespace SalonManagement.Controllers.v1
 {
     //[Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[Controller]/[Action]")]
     [ApiController]
     [ApiVersion("1.0")]
-    public class CountryAPIController : ControllerBase
+    public class BookingAPIController : ControllerBase
     {
         protected APIResponse _response;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _db;
-        public CountryAPIController(IUnitOfWork unitOfWork, 
-            IMapper mapper, ApplicationDbContext db)
+        public BookingAPIController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _response = new();
-            _db = db;
         }
 
 
-        [HttpGet(Name = "GetCountrys")]
+        [HttpGet(Name = "GetBookings")]
         [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetCountrys(
+        public async Task<ActionResult<APIResponse>> GetBookings([FromQuery(Name = "filterDisplayOrder")] int? Id,
             [FromQuery] string search, int pageSize = 0, int pageNumber = 0)
         {
-          
-             try
+            try
             {
-                IEnumerable<Country> countryList = await _unitOfWork.Country.GetAllAsync();
+                IEnumerable<Booking> bookingList = await _unitOfWork.Booking.GetAllAsync(includeProperties: "Country");
 
 
                 if (!string.IsNullOrEmpty(search))
                 {
                     string datasearch = search.ToLower();
-                    countryList = countryList.Where(u => u.CountryName.ToLower().Contains(datasearch));
+                    bookingList = bookingList.Where(u => u.CustomerName.ToLower().Contains(datasearch));
                 }
                 // Pagination pagination = new() { PageNumber = pageNumber, PageSize = pageSize };
                 if (pageNumber > 0)
                 {
-                    countryList = countryList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                    bookingList = bookingList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
                 }
-                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(countryList));
-                _response.Result = _mapper.Map<List<CountryDTO>>(countryList);
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(bookingList));
+                _response.Result = _mapper.Map<List<BookingDTO>>(bookingList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -72,18 +64,16 @@ namespace SalonManagement.Controllers.V1
             return _response;
         }
 
-     
 
-
-        [HttpGet("{id:int}", Name = "GetCountry")]
+        [HttpGet("{id:int}", Name = "GetBooking")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(200, Type =typeof(CategoryDTO))]
+        //[ProducesResponseType(200, Type =typeof(BookingDTO))]
         //        [ResponseCache(Location =ResponseCacheLocation.None,NoStore =true)]
-        public async Task<ActionResult<APIResponse>> GetCountry(int id)
+        public async Task<ActionResult<APIResponse>> GetBooking(int id)
         {
             try
             {
@@ -92,13 +82,13 @@ namespace SalonManagement.Controllers.V1
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var country = await _unitOfWork.Country.GetAsync(u => u.Id == id);
-                if (country == null)
+                var booking = await _unitOfWork.Booking.GetAsync(u => u.Id == id);
+                if (booking == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
-                _response.Result = _mapper.Map<CountryDTO>(country);
+                _response.Result = _mapper.Map<BookingDTO>(booking);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -111,33 +101,32 @@ namespace SalonManagement.Controllers.V1
             return _response;
         }
 
-        [HttpPost(Name = "CreateCountry")]
+        [HttpPost(Name = "CreateBooking")]
+        // [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> CreateCountry([FromForm]CountryCreateDTO createDTO)
+        public async Task<ActionResult<APIResponse>> CreateBooking([FromForm] BookingCreateDTO createDTO)
         {
 
             try
             {
-             
-                if (await _unitOfWork.Country.GetAsync(u => u.CountryName.ToLower() == createDTO.CountryName.ToLower()) != null)
+                if (await _unitOfWork.Booking.GetAsync(u => u.CustomerEmail.Trim().ToLower() == createDTO.CustomerEmail.Trim().ToLower()) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "CountryName already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "Booking name already Exists!");
                     return BadRequest(ModelState);
                 }
-
                 if (createDTO == null)
                 {
                     return BadRequest(createDTO);
                 }
-              
-                Country country = _mapper.Map<Country>(createDTO);
-            
-                await _unitOfWork.Country.CreateAsync(country);
-                _response.Result = _mapper.Map<CountryDTO>(country);
+
+                Booking booking = _mapper.Map<Booking>(createDTO);
+
+                await _unitOfWork.Booking.CreateAsync(booking);
+                _response.Result = _mapper.Map<BookingDTO>(booking);
                 _response.StatusCode = HttpStatusCode.Created;
-                return CreatedAtRoute("GetCountry", new { id = country.Id }, _response);
+                return CreatedAtRoute("GetBooking", new { id = booking.Id }, _response);
             }
             catch (Exception ex)
             {
@@ -153,9 +142,9 @@ namespace SalonManagement.Controllers.V1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("{id:int}", Name = "DeleteCountry")]
-     //   [Authorize(Roles = "admin")]
-        public async Task<ActionResult<APIResponse>> DeleteCountry(int id)
+        [HttpDelete("{id:int}", Name = "DeleteBooking")]
+        //   [Authorize(Roles = "admin")]
+        public async Task<ActionResult<APIResponse>> DeleteBooking(int id)
         {
             try
             {
@@ -163,12 +152,12 @@ namespace SalonManagement.Controllers.V1
                 {
                     return BadRequest();
                 }
-                var country = await _unitOfWork.Country.GetAsync(u => u.Id == id);
-                if (country == null)
+                var booking = await _unitOfWork.Booking.GetAsync(u => u.Id == id);
+                if (booking == null)
                 {
                     return NotFound();
                 }
-                await _unitOfWork.Country.RemoveAsync(country);
+                await _unitOfWork.Booking.RemoveAsync(booking);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);
@@ -181,11 +170,11 @@ namespace SalonManagement.Controllers.V1
             }
             return _response;
         }
-    //    [Authorize(Roles = "admin")]
-        [HttpPut("{id:int}", Name = "UpdateCountry")]
+        //    [Authorize(Roles = "admin")]
+        [HttpPut("{id:int}", Name = "UpdateBooking")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> UpdateCountry(int id, [FromForm] CountryUpdateDTO updateDTO)
+        public async Task<ActionResult<APIResponse>> UpdateBooking(int id, [FromForm] BookingUpdateDTO updateDTO)
         {
             try
             {
@@ -193,14 +182,14 @@ namespace SalonManagement.Controllers.V1
                 {
                     return BadRequest();
                 }
-                if (await _unitOfWork.Country.GetAsync(u => u.CountryName.ToLower() == updateDTO.CountryName.ToLower() && u.Id != updateDTO.Id) != null)
+                if (await _unitOfWork.Booking.GetAsync(u => u.CustomerEmail.ToLower() == updateDTO.CustomerEmail.ToLower() && u.Id != updateDTO.Id) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "CountryName already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "BookingName already Exists!");
                     return BadRequest(ModelState);
                 }
 
-                Country model = _mapper.Map<Country>(updateDTO);
-                await _unitOfWork.Country.UpdateAsync(model);
+                Booking model = _mapper.Map<Booking>(updateDTO);
+                await _unitOfWork.Booking.UpdateAsync(model);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);
@@ -214,5 +203,6 @@ namespace SalonManagement.Controllers.V1
             return _response;
         }
 
+      
     }
 }

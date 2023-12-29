@@ -61,13 +61,21 @@ namespace SalonManagement
             CreateMap<SalonBranchXService, SalonBranchXServiceCreateDTO>().ReverseMap();
             CreateMap<SalonBranchXService, SalonBranchXServiceUpdateDTO>().ReverseMap();
 
-            //CreateMap<SalonBranchXPayment, SalonBranchXPaymentDTO>().ReverseMap();
-            //CreateMap<SalonBranchXPayment, SalonBranchXPaymentCreateDTO>().ReverseMap();
-            //CreateMap<SalonBranchXPayment, SalonBranchXPaymentUpdateDTO>().ReverseMap();
+            CreateMap<SalonBranchXPayment, SalonBranchXPaymentDTO>().ReverseMap();
+            CreateMap<SalonBranchXPayment, SalonBranchXPaymentCreateDTO>().ReverseMap();
+            CreateMap<SalonBranchXPayment, SalonBranchXPaymentUpdateDTO>().ReverseMap();
 
-            //CreateMap<SalonBranchXGender, SalonBranchXGenderDTO>().ReverseMap();
-            //CreateMap<SalonBranchXGender, SalonBranchXGenderCreateDTO>().ReverseMap();
-            //CreateMap<SalonBranchXGender, SalonBranchXGenderUpdateDTO>().ReverseMap();
+            CreateMap<SalonBranchXGender, SalonBranchXGenderDTO>().ReverseMap();
+            CreateMap<SalonBranchXGender, SalonBranchXGenderCreateDTO>().ReverseMap();
+            CreateMap<SalonBranchXGender, SalonBranchXGenderUpdateDTO>().ReverseMap();
+
+            CreateMap<Booking, BookingDTO>().ReverseMap();
+            CreateMap<Booking, BookingCreateDTO>().ReverseMap();
+            CreateMap<Booking, BookingUpdateDTO>().ReverseMap();
+
+            CreateMap<SalonBranch, SalonBranchDTO>().ReverseMap();
+            CreateMap<SalonBranch, SalonBranchCreateDTO>().ReverseMap();
+            CreateMap<SalonBranch, SalonBranchUpdateDTO>().ReverseMap();
         }
     }
 }

@@ -22,8 +22,11 @@ namespace SalonManagement.Data
         public DbSet<Country> Countries { get; set; }
         public DbSet<State> States { get; set; }
         public DbSet<City> Cities { get; set; }
-        
-
+        public DbSet<SalonBranchXGender> SalonBranchXGenders { get; set; }
+        public DbSet<SalonBranchXPayment> SalonBranchXPayments { get; set; }
+        public DbSet<SalonBranchXService> SalonBranchXServices { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<SalonBranch> SalonBranchs { get; set; }
 
 
 
